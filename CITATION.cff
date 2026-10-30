@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this result, please cite it as below."
+title: "Turán's pure power sum constant: C42 <= 0.6865"
+abstract: >-
+  A proof, with a certified computation in Arb ball arithmetic, that limsup R_n <= 0.6865 in Turán's pure power
+  sum problem (Erdős problem #519; constant C42 of the Optimization Constants repository). Unrefereed; made with
+  substantial help from AI models (Claude Opus 5.5 and Claude Sonnet 5.5, Anthropic).
+authors:
+  - family-names: Bakeas
+    given-names: Vasileios
+    affiliation: "Department of Mechanical Engineering, University of Thessaly, Volos, Greece"
+    email: bakeasb@gmail.com
+type: software
+version: 1.0.0
+repository-code: "https://github.com/Bakeas/turan-c42-bound"
+license:
+  - MIT
+  - CC-BY-4.0
