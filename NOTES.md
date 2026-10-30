@@ -28,7 +28,7 @@ Notation: $s_k(z)=\sum_j z_j^k$. Powers $t^{w}$ with $t>0$, $w\in\mathbb C$ mean
 For complex numbers $s_1,\dots,s_K$, define the formal power series
 $$A(x)=\exp\Bigl(-\sum_{k=1}^{K}\frac{s_k}{k}x^k\Bigr)=\sum_{m\ge0}\alpha_m x^m,\qquad P_m=\alpha_0+\dots+\alpha_m\quad\Bigl(\text{so }\sum_m P_mx^m=\frac{A(x)}{1-x}\Bigr).$$
 
-**Lemma 2.** Let $n\ge3$ and $\lfloor n/2\rfloor\le K<n$. Let $s_1,\dots,s_K\in\mathbb C$, and put $D_n=\sum_{k=K+1}^{n}|P_{n-k}|/k$; note $D_n\ge 1/n>0$ because $P_0=1$. Then there are $z_1=1,z_2,\dots,z_n\in\mathbb C$ such that
+**Lemma 2.** Let $n\ge2$ and $\lfloor n/2\rfloor\le K<n$. Let $s_1,\dots,s_K\in\mathbb C$, and put $D_n=\sum_{k=K+1}^{n}|P_{n-k}|/k$; note $D_n\ge 1/n>0$ because $P_0=1$. Then there are $z_1=1,z_2,\dots,z_n\in\mathbb C$ such that
 - $s_k(z)=s_k$ for $1\le k\le K$;
 - $|s_k(z)|=|P_n|/D_n$ for $K<k\le n$.
 
@@ -62,11 +62,12 @@ For a constant first block, Lemma 2 is the argument in G. Harcos's note "On a re
 - Put $g(u)=Te^{i\varphi(u)}$, $\gamma=g(0)$ and $a=\operatorname{Re}\gamma$.
 - Define
 $$d(u)=\gamma-g(u)\quad(0<u\le\tfrac12),\qquad d(u)=\gamma\quad(u>\tfrac12),\qquad \kappa=\sup_{0<u\le1}|d(u)| .$$
+We also put $d(0)=0$ (its limit). Single points do not affect any of the integrals below.
 
-**The construction.** For $n\ge3$, apply Lemma 2 with $K=\lfloor n/2\rfloor$ and $s_k=g(k/n)$ ($1\le k\le K$; note $k/n\le\tfrac12$). Since $|s_k|=T$,
+**The construction.** For $n\ge2$, apply Lemma 2 with $K=\lfloor n/2\rfloor$ and $s_k=g(k/n)$ ($1\le k\le K$; note $k/n\le\tfrac12$). Since $|s_k|=T$,
 $$R_n\le\max(T,F_n),\qquad F_n=|P_n|/D_n. \tag{1}$$
 
-**Theorem A.** Assume $a<1$ and $\kappa<1$.
+**Theorem A.** Assume $\kappa<1$ and $a\ge0$. (Then automatically $a\le|\gamma|=T\le\kappa<1$, because $|d|=T$ on $(\frac12,1]$.)
 1. The equation
 $$t\,\rho(t)=d(t)+\int_0^t d(u)\,\rho(t-u)\,du\qquad(0<t\le1) \tag{2}$$
 has exactly one bounded solution $\rho$ on $(0,1]$.
@@ -93,7 +94,7 @@ $$P_j=\sum_{i=0}^{j}a_{j-i}\,\delta_i . \tag{5}$$
 
 ### Step 2: the continuous problem
 
-Let $X$ be the bounded functions on $(0,1]$ with the sup norm. Put
+Let $X$ be the bounded Borel-measurable functions on $(0,1]$ with the sup norm (a Banach space). Put
 $$(\mathcal Kf)(t)=\frac1t\int_0^t d(u)f(t-u)\,du .$$
 - $\|\mathcal Kf\|\le\kappa\|f\|$.
 - $\mathcal Kf$ is continuous on $(0,1]$, since $d*f$ is the convolution of a bounded function with a bounded function on $[0,1]$.
@@ -148,15 +149,22 @@ $$|\Pi_n(j)|\le C\,t^{-a},\qquad C=C_\eta+|\Gamma(1-\gamma)|B+\frac{C_\eta B}{1-
 
 **(B1) Convergence.** For every $\varepsilon>0$,
 $$\sup_{\varepsilon n\le j\le n}|\Pi_n(j)-p(j/n)|\to0 .$$
-*Proof.* Fix $\delta\in(0,\varepsilon)$.
-- The terms with $l\le\delta n$, and the part of the integral with $t-v\le\delta$, are both at most $C_\eta B\,\delta^{1-a}/(1-a)$ in modulus (note $C_\eta\ge1$, since $\eta_l\to1$).
-- On the remaining terms, $\eta_l\to1$ uniformly (because $l>\delta n$).
-- $(l/n)^{-\gamma}$ is uniformly continuous for $l/n\ge\delta$.
-- By (7), $\rho_n(j-l)$ may be replaced by $\rho((j-l)/n)$.
-- The Riemann sums of $v\mapsto(t-v)^{-\gamma}\rho(v)$ over $v\le t-\delta$ converge uniformly in $t\in[\varepsilon,1]$. This is the same oscillation argument as in Step 3; $\rho$ has a single jump.
-- The first term $\eta_j(j/n)^{-\gamma}$ tends to $t^{-\gamma}$ uniformly, because $j\ge\varepsilon n\to\infty$.
+*Proof.* Let $t=j/n\in[\varepsilon,1]$ and fix $\delta\in(0,\varepsilon/2)$. Split
+$$p(t)=t^{-\gamma}+I_{\le\delta}(t)+I_{>\delta}(t),\qquad I_{\le\delta}=\int_0^{\delta}u^{-\gamma}\rho(t-u)\,du,\quad I_{>\delta}=\int_\delta^{t}u^{-\gamma}\rho(t-u)\,du .$$
+Split the last sum in $\Pi_n(j)$ the same way: $\Sigma_{\le\delta}$ (over $1\le l\le\delta n$) and $\Sigma_{>\delta}$ (over $\delta n<l\le j-1$). Then:
 
-Letting $n\to\infty$ and then $\delta\to0$ proves (B1). $\square$
+1. **First term.** $|\eta_j(j/n)^{-\gamma}-t^{-\gamma}|=|\eta_j-1|\,t^{-a}\le|\eta_j-1|\,\varepsilon^{-a}\to0$ uniformly, since $j\ge\varepsilon n$.
+2. **Middle term.** It tends to $0$ (shown above).
+3. **Near part.** $|\Sigma_{\le\delta}|\le C_\eta B\,\delta^{1-a}/(1-a)$ and $|I_{\le\delta}|\le B\,\delta^{1-a}/(1-a)\le C_\eta B\,\delta^{1-a}/(1-a)$. Here $C_\eta\ge1$, since $\eta_l\to1$.
+4. **Replacing $\rho_n$ by $\rho$.** Let $\Sigma'$ be $\Sigma_{>\delta}$ with $\rho_n(j-l)$ replaced by $\rho((j-l)/n)$. Then $|\Sigma_{>\delta}-\Sigma'|\le C_\eta\max_m|e_m|\cdot\frac1n\sum_{l\le n}(l/n)^{-a}\le C_\eta\max_m|e_m|/(1-a)\to0$ by (7).
+5. **Replacing $\eta_l$ by $1$.** Let $\Sigma''$ be $\Sigma'$ with $\eta_l$ replaced by $1$. Then $|\Sigma'-\Sigma''|\le\sup_{l>\delta n}|\eta_l-1|\cdot B/(1-a)\to0$.
+6. **Riemann sum.** $\Sigma''=\frac1n\sum_{\delta n<l\le j-1}(l/n)^{-\gamma}\rho(t-l/n)$ is a right-endpoint Riemann sum, with cells of width $1/n$, for $I_{>\delta}=\int_\delta^tu^{-\gamma}\rho(t-u)\,du$.
+   - The two end cells contribute at most $2(\delta/2)^{-a}B/n$.
+   - On every other cell, the oscillation of $u\mapsto u^{-\gamma}\rho(t-u)$ is at most $B\,\omega_1(1/n)+\delta^{-a}\omega_\rho(1/n)$. Here $\omega_1$ is the modulus of continuity of $u^{-\gamma}$ on $[\delta/2,1]$, and $\omega_\rho$ is as in Step 3.
+   - The exception is the at most one cell that contains the jump of $\rho(t-\cdot)$ (at $u=t-\frac12$). There the oscillation is at most $2\delta^{-a}B$, and the contribution is at most $2\delta^{-a}B/n$.
+   - Hence $|\Sigma''-I_{>\delta}|\to0$ uniformly in $t\in[\varepsilon,1]$.
+
+Therefore $\limsup_n\sup_{\varepsilon n\le j\le n}|\Pi_n(j)-p(j/n)|\le2C_\eta B\,\delta^{1-a}/(1-a)$ for every small $\delta>0$. Letting $\delta\to0$ proves (B1). $\square$
 
 ### Step 5: conclusion
 
@@ -188,7 +196,7 @@ Its properties:
 - $a=\operatorname{Re}\gamma=0.16611\ldots\in(0,1)$.
 - $\max_j|\psi_j-\psi_0|=0.7752<\pi$. So on $(0,\frac12]$, $|d(u)|=2T|\sin((\varphi(u)-\psi_0)/2)|$ is largest at a knot, and is at most $0.519$.
 - On $(\frac12,1]$, $|d|=T$. Hence $\kappa=T=0.6865<1$.
-- All slopes $\beta_j$ are nonzero ($1.19\le|\beta_j|\le5.83$).
+- All slopes $\beta_j$ are nonzero ($1.19\le|\beta_j|\le5.83$). This is not used in the proof. It is needed only by the program, whose closed-form moments divide by $\beta_j$.
 
 So Theorem A applies, and it remains to show $F<T$.
 
@@ -230,6 +238,7 @@ $$\sup_{[t_i,t_{i+1}]}|R/t|\le\frac{\max(|R(t_i^+)|,|R(t_{i+1}^-)|)+\frac{h^2}8\
   This is linear interpolation with the Peano-kernel error bound.
 - For $i=0$: $R(0)=0$ and $R'(0^+)=d'(0)-\tilde\rho(0)$, so
 $$|R/t|\le|R'(0^+)|+\tfrac h2\bigl(|R''(t_c)|+\tfrac h2B_3\bigr).$$
+- At $t=\frac12$ both one-sided values $R(t_H^\pm)$ enter the bounds, so any convention for the value $\tilde\rho(\frac12)$ is covered.
 - The maximum over all cells, divided by $1-\kappa$, is $\varepsilon$ (Lemma 3).
 
 **(D1) Numerator.** $\tilde p(1)$ is computed exactly per cell from the moments of $u^{-\gamma}$ and $u^{1-\gamma}$ (closed form). The numerator of (8) is then bounded above.
@@ -252,6 +261,13 @@ The program prints `PASS` only if the resulting upper bound for $F$ is certainly
 | 320 | 15 360 | 6.76e-6 | 2.16e-5 | 0.391152 | 0.569973 | 0.686264 | PASS |
 | 640 | 30 720 | 1.69e-6 | 5.40e-6 | 0.391133 | 0.569980 | **0.686221** | PASS |
 
+**A second, independent checker.** `independent_check.py` was written by a separate AI instance (Claude Code, Claude Opus 5.5) from this file only, before it saw `rigorous_limit.py`. It uses the same principle (Lemma 3 and (8)), but a different implementation:
+- the convolutions are computed through the "ramp" form $\tilde\rho(v)=\tilde\rho(0)+\sigma_0v+\sum_k\Delta_k(v-t_k)_++J\mathbf 1_{v>1/2}$ and closed-form antiderivatives;
+- $\sup|R''|$ is enclosed cell by cell, with no global bound on $R'''$;
+- the cut near $0$ is smaller.
+
+At $M=640$ it gives $F\le0.6862175$ (PASS). `rigorous_limit.py` gives $F\le0.6862204$. The two agree on $\tilde p(1)$ to all printed digits. On Harcos's constant-phase profile, whose exact value $0.6936763$ is known, it gives upper bounds that decrease towards that value as $M$ grows. Its referee report is in `AI_REVIEW.md`. Its remarks (the hypothesis $a\ge0$, measurability, the convention $d(0)=0$, the details of (B1)) are incorporated in this version.
+
 Hence $F<0.6865=T$, and by Theorem A, $\limsup_n R_n\le0.6865$. $\blacksquare$
 
 ## 5. Independent numerical cross-checks (floating point, not part of the proof)
@@ -271,4 +287,4 @@ Hence $F<0.6865=T$, and by Theorem A, $\limsup_n R_n\le0.6865$. $\blacksquare$
 
 ## AI use
 
-The construction, the proof, the code and this text were produced with substantial help from AI models (Claude Opus 5.5 and Claude Sonnet 5.5, Anthropic), directed by the author, who also ran and checked the computations. The proof has not yet been reviewed by a professional mathematician. Corrections are very welcome.
+The construction, the proof, the code and this text were produced with substantial help from AI models (Claude Opus 5.5 and Claude Sonnet 5.5, Anthropic), directed by the author, who also ran and checked the computations. The proof was also checked by a separate AI instance (`AI_REVIEW.md`), but it has not yet been reviewed by a professional mathematician. Corrections are very welcome.

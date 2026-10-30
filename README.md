@@ -32,6 +32,12 @@ python rigorous_limit.py c42_profile_0.6865.json 640        # about 10 seconds, 
 
 `expected_output_M640.txt` has the output we obtained ($F\le0.686221$).
 
+A second, independently written rigorous checker gives $F\le0.686218$:
+
+```bash
+python independent_check.py c42_profile_0.6865.json 640
+```
+
 Optional floating-point cross-checks (not part of the proof):
 - `python crosscheck/limit_direct.py`: a different solver of the limit equation. It also reproduces Harcos's 0.693676.
 - `python crosscheck/finite_n.py`: the exact finite-$n$ construction up to $n=4\cdot10^6$. Its values approach the same limit, 0.68620.
@@ -43,6 +49,8 @@ Optional floating-point cross-checks (not part of the proof):
 | `NOTES.md` | statement, complete proof (Lemmas 1–3, Theorem A), and exactly what the program checks |
 | `c42_profile_0.6865.json` | the certificate: $T$ and the 25 phase values (exact decimals) |
 | `rigorous_limit.py` | rigorous checker (python-flint / Arb) |
+| `independent_check.py` | second rigorous checker, written independently from NOTES.md only |
+| `AI_REVIEW.md` | referee-style review of NOTES.md by a separate AI instance (its remarks are incorporated) |
 | `expected_output_M640.txt` | its output |
 | `crosscheck/` | floating-point cross-checks |
 
@@ -52,7 +60,7 @@ Rigorous upper bounds for $R_n$ at specific $n$ (300 to $10^6$), by the same aut
 
 ## AI use
 
-The construction, the proof, the code and the text were produced with substantial help from AI models (Claude Opus 5.5 and Claude Sonnet 5.5, Anthropic), directed by the author, who also ran and checked the computations. The proof has not yet been reviewed by a professional mathematician. Corrections are very welcome (GitHub issue or email).
+The construction, the proof, the code and the text were produced with substantial help from AI models (Claude Opus 5.5 and Claude Sonnet 5.5, Anthropic), directed by the author, who also ran and checked the computations. The proof was checked by a separate AI instance (`AI_REVIEW.md`), but it has not yet been reviewed by a professional mathematician. Corrections are very welcome (GitHub issue or email).
 
 ## License
 
