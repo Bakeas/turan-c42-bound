@@ -8,4 +8,4 @@
        den_low: 0.5699807818407264
           F_up: 0.6862204484038148
         RESULT: PASS: F < T, hence limsup R_n <= T = 0.6865
-       seconds: 5.2
+       seconds: 5.1

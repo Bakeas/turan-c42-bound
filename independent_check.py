@@ -34,6 +34,9 @@ import time
 import numpy as np
 from flint import acb, acb_poly, arb, arb_poly, ctx
 
+if not __debug__:   # the checks below are assert statements, which python -O would remove
+    sys.exit("run this program without python -O")
+
 PREC = 192
 NPIECES = 24          # knots j/48, j = 0..24, cover [0, 1/2]
 
@@ -71,6 +74,7 @@ def main():
     T = arb(prof["T"])
     psi = [arb(s) for s in prof["phases"]]
     assert len(psi) == NPIECES + 1
+    assert str(prof.get("knots", "")).replace(" ", "") in ("j/48", "j/48,j=0..24"), "this program assumes the knots j/48"
     beta = [48 * (psi[j + 1] - psi[j]) for j in range(NPIECES)]
     I = acb(0, 1)
     gam = T * (I * psi[0]).exp()
@@ -203,6 +207,7 @@ def main():
     for i in range(1, N):
         e = max(Rp[i].abs_upper(), Rm[i + 1].abs_upper())
         res.append(((e + h * h / 8 * U[i]) / t[i]).upper())
+    assert all(r.is_finite() for r in res), "a cell bound is not finite"
     imax = max(range(N), key=lambda i: res[i])
     supR = res[imax]
     eps = (supR / (1 - kappa)).upper()
@@ -248,6 +253,7 @@ def main():
     den_p = den.lower()
     Iw = (half ** (2 - a) / (2 - a) + 2 * half ** (3 - a) / (3 - a)) / (1 - a)
     den_lo = (den - eps * Iw).lower()
+    assert num.is_finite() and den_lo.is_finite()
     assert den_lo > 0
     Fup = (num / den_lo).upper()
     t4 = time.time()
@@ -269,6 +275,7 @@ def main():
         print("PASS  (F < T certified)")
     else:
         print("FAIL  (bound not below T)")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

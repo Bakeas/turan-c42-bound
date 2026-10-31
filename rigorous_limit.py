@@ -16,7 +16,8 @@ Everything below the line "rigorous part" is ball arithmetic on exact rational i
 
 The inequalities checked are (C1)-(C4), (D1)-(D3) of NOTES.md, Section 4.
 
-Run:   python rigorous_limit.py c42_profile_0.6865.json 640      (M = cells per knot interval; about 10 s)
+Run:   python rigorous_limit.py c42_profile_0.68637.json 2560    (M = cells per knot interval; 1 to 3 minutes)
+       python rigorous_limit.py c42_profile_0.6865.json 640       (version-1.0.0 profile; a few seconds)
 Needs: numpy, python-flint (tested with 0.9.0)
 """
 import json, math, sys, time
@@ -66,16 +67,21 @@ def check(T, ph, M, prec=192):
     I = acb(0, 1)
     gam = Ta * acb(0, psi[0]).exp()
     a_re = gam.real                                   # a = Re gamma
-    assert a_re < 1 and a_re > 0
+    if not (a_re < 1 and a_re > 0):
+        sys.exit('FAIL: need 0 < Re(gamma) < 1')
     def cis(x):
         return acb(0, x).exp()
     def phi_at(j, u):                                 # phi on knot interval j at point u (arb)
         return psi[j] + beta[j] * (u - arb(fmpq(j, 2 * NK)))
     # ---- kappa = sup |d|:  |gamma - g(u)| = 2T|sin((phi(u)-psi0)/2)|, phi piecewise linear -> max at knots (|phi-psi0| < pi)
     devs = [abs(psi[j] - psi[0]) for j in range(NK + 1)]
-    assert all(x < arb(3) for x in devs)
+    if not all(x < arb(3) for x in devs):
+        sys.exit('FAIL: need |psi_j - psi_0| < 3 (< pi) for the bound on kappa')
     kappa_up = max([Ta.upper()] + [abs(2 * Ta * (x / 2).sin()).upper() for x in devs])     # exact arb points
-    assert kappa_up < 1
+    if not (kappa_up < 1):
+        sys.exit('FAIL: need kappa < 1')
+    if not all(abs(b) > 0 for b in beta):
+        sys.exit('FAIL: a slope beta_j is not certainly nonzero (this program divides by beta_j)')
     bmax = max(abs(b).upper() for b in beta)
     # ---- rho~ as exact numbers
     def ex(z):
@@ -128,8 +134,12 @@ def check(T, ph, M, prec=192):
     for i in range(1, N):
         num = max(abs(RR[i]).upper(), abs(RL[i + 1]).upper()) + h * h / 8 * (abs(R2[i]) + h / 2 * B3)
         b_i = num / (i * h)
+        if not b_i.is_finite():
+            sys.exit('FAIL: a cell bound is not finite')
         if b_i.upper() > worst.upper():
             worst = b_i
+    if not worst.is_finite():
+        sys.exit('FAIL: a cell bound is not finite')
     err_rho = worst.upper() / (1 - kappa_up)
     # ---- p~ : moments of u^(-gamma) on cells
     e1, e2 = 1 - gam, 2 - gam
@@ -148,7 +158,8 @@ def check(T, ph, M, prec=192):
     ts = arb(fmpq(Ks, N))
     Pstar = max([abs(rR[k]).upper() for k in range(Ks + 1)] + [abs(rL[k]).upper() for k in range(1, Ks + 1)])
     Pstar = arb(Pstar)
-    assert (Pstar * ts / one_a).upper() < 0.5
+    if not ((Pstar * ts / one_a).upper() < 0.5):
+        sys.exit('FAIL: near-zero lower bound (D2) is not positive; use a larger M')
     part0 = ts ** one_a / one_a - Pstar * ts ** (2 - a_re) / (one_a * (2 - a_re))
     cpow = [(arb(fmpq(m + 1, N)) ** one_a - (arb(fmpq(m, N)) ** one_a if m else arb(0))) / one_a for m in range(H + 1)]
     absdS = [arb(abs(x).upper()) for x in dS[:H + 1]]
@@ -165,9 +176,13 @@ def check(T, ph, M, prec=192):
         total += lin - h * h / 8 * Q / (1 - tk1)
     corr = err_rho * 2 * arb(0.5) ** (2 - a_re) / (one_a * (2 - a_re))
     den_low = total - corr
-    F_up = num_up / den_low
     C = Ta                                                     # claimed constant = T
-    ok = bool(F_up < C)             # |g(u)| = T exactly by construction
+    if not (num_up.is_finite() and den_low.is_finite()):
+        sys.exit('FAIL: the bounds for the numerator or the denominator are not finite')
+    if not (den_low > 0):                                      # (8) needs a certainly positive denominator
+        return dict(N=N, den_low=float(den_low.lower()), RESULT='FAIL: the lower bound for the denominator is not positive')
+    F_up = num_up / den_low
+    ok = bool(F_up < C)             # |g(u)| = T exactly by construction; den_low > 0 checked above
     return dict(N=N, a_re_gamma=float(a_re.mid()), kappa=float(kappa_up), sup_R_over_t=float(worst.upper()), err_rho=float(err_rho.upper()),
                 p1=str(p1), num_up=float(num_up.upper()), den_low=float(den_low.lower()), F_up=float(F_up.upper()),
                 RESULT=('PASS: F < T, hence limsup R_n <= T = ' + str(T) if ok else 'FAIL'), seconds=round(time.time() - t_start, 1))
@@ -176,6 +191,11 @@ def check(T, ph, M, prec=192):
 if __name__ == "__main__":
     prof = json.load(open(sys.argv[1]))
     M = int(sys.argv[2]) if len(sys.argv) > 2 else 160
+    if len(prof["phases"]) != NK + 1:
+        sys.exit(f'FAIL: the profile must have exactly {NK + 1} phases')
+    if str(prof.get("knots", "")).replace(" ", "") not in ("j/48", "j/48,j=0..24"):
+        sys.exit('FAIL: this program assumes the knots j/48, j = 0..24')
     r = check(prof["T"], prof["phases"], M)
     for k, v in r.items():
         print(f"{k:>14}: {v}")
+    sys.exit(0 if r["RESULT"].startswith("PASS") else 1)      # exit code 1 for every FAIL

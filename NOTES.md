@@ -1,13 +1,19 @@
-# C42 ≤ 0.6865: proof and computer verification
+# C42 ≤ 0.68637: proof and computer verification
 
 **Main result.** For Turán's pure power sum problem,
-$$\limsup_{n\to\infty} R_n \;\le\; 0.6865 ,\qquad R_n=\inf_{z_1=1,\;z_2,\dots,z_n\in\mathbb C}\ \max_{1\le k\le n}\ \Bigl|\sum_{j=1}^n z_j^k\Bigr| .$$
+$$\limsup_{n\to\infty} R_n \;\le\; 0.68637 ,\qquad R_n=\inf_{z_1=1,\;z_2,\dots,z_n\in\mathbb C}\ \max_{1\le k\le n}\ \Bigl|\sum_{j=1}^n z_j^k\Bigr| .$$
 
 **Status.** Not peer reviewed; written with AI assistance (see the end of the file).
 
+**Versions.**
+- Version 1.1.0 (31 Oct 2026) proves the bound $0.68637$ with the profile `c42_profile_0.68637.json`. It also fixes a bug in `rigorous_limit.py`, found by Ricardo Pinho: version 1.0.0 did not check that the lower bound for the denominator in (8) is positive, so a profile for which that bound is negative could get a false `PASS`. The program now prints `FAIL` in that case. For both profiles in this repository the bound is about $0.570$, so their results are not affected. `independent_check.py` already made this check.
+- Version 1.0.0 (30 Oct 2026) proved the weaker bound $0.6865$ with the profile `c42_profile_0.6865.json`. That profile is kept in the repository, and its numbers are also given in Section 4.
+
+The mathematics of the proof is the same for both. In version 1.1.0 its text was made more complete, following the first review in `AI_REVIEW.md`: Theorem A now assumes $a\ge0$, $X$ consists of measurable functions, $d(0)=0$ is a stated convention, Lemma 2 is stated for $n\ge2$, the proof of (B1) is written out in full, and (C4) has a remark on the value $\tilde\rho(\frac12)$. After the second review (also in `AI_REVIEW.md`), both programs were made stricter on their input: they also stop if the profile does not have exactly 25 phases with the knots $j/48$, or if a computed bound is not finite (`rigorous_limit.py` with a `FAIL` message, `independent_check.py` with an `AssertionError`). In both programs every failure now ends with exit code 1. These checks do not change any number.
+
 **What the proof consists of:**
 - A complete proof of a limit theorem (Theorem A below).
-- One inequality, $F < 0.6865$, about the solution of an explicit integral equation. This inequality is verified in ball arithmetic (Arb, via python-flint) by `rigorous_limit.py`. Its output is $F \le 0.686221$.
+- One inequality, $F < 0.68637$, about the solution of an explicit integral equation. This inequality is verified in ball arithmetic (Arb, via python-flint) by two independently written programs, `rigorous_limit.py` and `independent_check.py`. Their outputs are $F\le0.6863660$ and $F\le0.6863615$.
 
 No other unverified step is used.
 
@@ -159,9 +165,10 @@ Split the last sum in $\Pi_n(j)$ the same way: $\Sigma_{\le\delta}$ (over $1\le 
 4. **Replacing $\rho_n$ by $\rho$.** Let $\Sigma'$ be $\Sigma_{>\delta}$ with $\rho_n(j-l)$ replaced by $\rho((j-l)/n)$. Then $|\Sigma_{>\delta}-\Sigma'|\le C_\eta\max_m|e_m|\cdot\frac1n\sum_{l\le n}(l/n)^{-a}\le C_\eta\max_m|e_m|/(1-a)\to0$ by (7).
 5. **Replacing $\eta_l$ by $1$.** Let $\Sigma''$ be $\Sigma'$ with $\eta_l$ replaced by $1$. Then $|\Sigma'-\Sigma''|\le\sup_{l>\delta n}|\eta_l-1|\cdot B/(1-a)\to0$.
 6. **Riemann sum.** $\Sigma''=\frac1n\sum_{\delta n<l\le j-1}(l/n)^{-\gamma}\rho(t-l/n)$ is a right-endpoint Riemann sum, with cells of width $1/n$, for $I_{>\delta}=\int_\delta^tu^{-\gamma}\rho(t-u)\,du$.
+   - Take $n\ge2/\delta$. Then every cell lies in $[\delta/2,1]$, where $|u^{-\gamma}|\le(\delta/2)^{-a}$.
    - The two end cells contribute at most $2(\delta/2)^{-a}B/n$.
-   - On every other cell, the oscillation of $u\mapsto u^{-\gamma}\rho(t-u)$ is at most $B\,\omega_1(1/n)+\delta^{-a}\omega_\rho(1/n)$. Here $\omega_1$ is the modulus of continuity of $u^{-\gamma}$ on $[\delta/2,1]$, and $\omega_\rho$ is as in Step 3.
-   - The exception is the at most one cell that contains the jump of $\rho(t-\cdot)$ (at $u=t-\frac12$). There the oscillation is at most $2\delta^{-a}B$, and the contribution is at most $2\delta^{-a}B/n$.
+   - On every other cell, the oscillation of $u\mapsto u^{-\gamma}\rho(t-u)$ is at most $B\,\omega_1(1/n)+(\delta/2)^{-a}\omega_\rho(1/n)$. Here $\omega_1$ is the modulus of continuity of $u^{-\gamma}$ on $[\delta/2,1]$, and $\omega_\rho$ is as in Step 3.
+   - The exception is the at most one cell that contains the jump of $\rho(t-\cdot)$ (at $u=t-\frac12$). There the oscillation is at most $2(\delta/2)^{-a}B$, and the contribution is at most $2(\delta/2)^{-a}B/n$.
    - Hence $|\Sigma''-I_{>\delta}|\to0$ uniformly in $t\in[\varepsilon,1]$.
 
 Therefore $\limsup_n\sup_{\varepsilon n\le j\le n}|\Pi_n(j)-p(j/n)|\le2C_\eta B\,\delta^{1-a}/(1-a)$ for every small $\delta>0$. Letting $\delta\to0$ proves (B1). $\square$
@@ -188,15 +195,15 @@ This is exactly Harcos's limit formula, which gives $0.693676$ for $w=-0.43246-0
 
 ## 4. The profile used, and the certified inequality F < T
 
-**The profile.** The profile is in `c42_profile_0.6865.json`:
-- $T=0.6865$;
+**The profile.** The profile is in `c42_profile_0.68637.json` (SHA-256 `dcea4edbec1d5935f2f04d4d1b5b8379e2d2d7d78072a1f089c7abbe11ded395`):
+- $T=0.68637$;
 - $\psi_0,\dots,\psi_{24}$ as exact decimal numbers.
 
-Its properties:
-- $a=\operatorname{Re}\gamma=0.16611\ldots\in(0,1)$.
-- $\max_j|\psi_j-\psi_0|=0.7752<\pi$. So on $(0,\frac12]$, $|d(u)|=2T|\sin((\varphi(u)-\psi_0)/2)|$ is largest at a knot, and is at most $0.519$.
-- On $(\frac12,1]$, $|d|=T$. Hence $\kappa=T=0.6865<1$.
-- All slopes $\beta_j$ are nonzero ($1.19\le|\beta_j|\le5.83$). This is not used in the proof. It is needed only by the program, whose closed-form moments divide by $\beta_j$.
+Its properties (computed in ball arithmetic):
+- $a=\operatorname{Re}\gamma=0.16609\ldots\in(0,1)$.
+- $\max_j|\psi_j-\psi_0|=0.7753<\pi$. So on $(0,\frac12]$, $|d(u)|=2T|\sin((\varphi(u)-\psi_0)/2)|$ is largest at a knot, and is at most $0.5190$.
+- On $(\frac12,1]$, $|d|=T$. Hence $\kappa=T=0.68637<1$.
+- All slopes $\beta_j$ are nonzero ($1.20\le|\beta_j|\le5.82$). This is not used in the proof. It is needed only by `rigorous_limit.py`, whose closed-form moments divide by $\beta_j$ (`independent_check.py` does not need it).
 
 So Theorem A applies, and it remains to show $F<T$.
 
@@ -252,31 +259,43 @@ $$\tilde p''(t)=\gamma(\gamma+1)t^{-\gamma-2}-\gamma\tilde\rho(0)t^{-\gamma-1}+\
 - Each term is integrated exactly in modulus. The singular terms $(t-t_k)^{-a}$ are integrable.
 - Finally the $\varepsilon$-correction of (8) is subtracted, using $\int_0^{1/2}\frac{t^{1-a}}{(1-a)(1-t)}\le\frac{2\cdot2^{a-2}}{(1-a)(2-a)}$.
 
-The program prints `PASS` only if the resulting upper bound for $F$ is certainly smaller than $T$, as a comparison of balls.
+The program prints `PASS` only if the lower bound for the denominator is certainly positive and the resulting upper bound for $F$ is certainly smaller than $T$, both as comparisons of balls. The other hypotheses it uses are checked as well: exactly 25 phases with the knots $j/48$, $0<a<1$, $|\psi_j-\psi_0|<3$ (for the bound on $\kappa$), $\kappa<1$, $\beta_j\ne0$, the positivity in (D2), and finite bounds. If one of them fails, the program stops with `FAIL` and exit code 1.
 
-### Output (python-flint 0.9.0)
+### Output of `rigorous_limit.py` (python-flint 0.9.0, Linux, Python 3.13)
 
-| $M$ | $N$ | $\sup|R/t|$ | $\varepsilon$ | upper bound for $|p(1)|$ | lower bound for $\int_0^{1/2}|p|/(1-t)$ | $F\le$ | result |
+Profile `c42_profile_0.68637.json` ($T=0.68637$):
+
+| $M$ | $N$ | $\sup\lvert R/t\rvert$ | $\varepsilon$ | upper bound for $\lvert p(1)\rvert$ | lower bound for $\int_0^{1/2}\lvert p\rvert/(1-t)$ | $F\le$ | result |
+|---:|---:|---|---|---|---|---|---|
+| 1280 | 61 440 | 4.22e-7 | 1.35e-6 | 0.391303 | 0.570105 | 0.6863687 | PASS |
+| 2560 | 122 880 | 1.06e-7 | 3.37e-7 | 0.391302 | 0.570106 | **0.6863660** | PASS |
+
+The margin is $T-F\ge4\cdot10^{-6}$. It is small, but this is a certified inequality between balls, not a floating-point comparison. Floating point gives $F\approx0.6863601$ (Section 5).
+
+Profile `c42_profile_0.6865.json` ($T=0.6865$, version 1.0.0):
+
+| $M$ | $N$ | $\sup\lvert R/t\rvert$ | $\varepsilon$ | upper bound for $\lvert p(1)\rvert$ | lower bound for $\int_0^{1/2}\lvert p\rvert/(1-t)$ | $F\le$ | result |
 |---:|---:|---|---|---|---|---|---|
 | 320 | 15 360 | 6.76e-6 | 2.16e-5 | 0.391152 | 0.569973 | 0.686264 | PASS |
-| 640 | 30 720 | 1.69e-6 | 5.40e-6 | 0.391133 | 0.569980 | **0.686221** | PASS |
+| 640 | 30 720 | 1.70e-6 | 5.40e-6 | 0.391133 | 0.569980 | 0.686221 | PASS |
 
 **A second, independent checker.** `independent_check.py` was written by a separate AI instance (Claude Code, Claude Opus 5.5) from this file only, before it saw `rigorous_limit.py`. It uses the same principle (Lemma 3 and (8)), but a different implementation:
 - the convolutions are computed through the "ramp" form $\tilde\rho(v)=\tilde\rho(0)+\sigma_0v+\sum_k\Delta_k(v-t_k)_++J\mathbf 1_{v>1/2}$ and closed-form antiderivatives;
 - $\sup|R''|$ is enclosed cell by cell, with no global bound on $R'''$;
 - the cut near $0$ is smaller.
 
-At $M=640$ it gives $F\le0.6862175$ (PASS). `rigorous_limit.py` gives $F\le0.6862204$. The two agree on $\tilde p(1)$ to all printed digits. On Harcos's constant-phase profile, whose exact value $0.6936763$ is known, it gives upper bounds that decrease towards that value as $M$ grows. Its referee report is in `AI_REVIEW.md`. Its remarks (the hypothesis $a\ge0$, measurability, the convention $d(0)=0$, the details of (B1)) are incorporated in this version.
+For the profile with $T=0.68637$ it gives $F\le0.6863647$ at $M=1280$ and $F\le0.6863615$ at $M=2560$, both PASS. `rigorous_limit.py` gives $0.6863687$ and $0.6863660$. The two programs agree on $\sup|R/t|$ to four significant digits and on the bound for $|p(1)|$ to seven decimals. Its bounds for $F$ are slightly smaller, because its cut near $0$ is smaller. For the version-1.0.0 profile it gives $F\le0.6862175$ at $M=640$, against $0.6862204$ from `rigorous_limit.py`. On Harcos's constant-phase profile, whose exact value $0.6936763$ is known, it gives upper bounds that decrease towards that value as $M$ grows. Its referee report is in `AI_REVIEW.md`. Its remarks (the hypothesis $a\ge0$, measurability, the convention $d(0)=0$, the details of (B1)) are incorporated in this version. Later the author added a few input checks to it (see Versions); its computation is unchanged.
 
-Hence $F<0.6865=T$, and by Theorem A, $\limsup_n R_n\le0.6865$. $\blacksquare$
+The two programs are independent code, but they follow the same mathematical route, Lemma 3 and (8). A mistake shared by Lemma 3 or (8) would not be caught by running both. Both are proved above, and the reviewer re-derived them by hand.
+
+Hence $F<0.68637=T$, and by Theorem A, $\limsup_n R_n\le0.68637$. $\blacksquare$
 
 ## 5. Independent numerical cross-checks (floating point, not part of the proof)
 
-- **Direct solver.** A solver for the equation $tp(t)=\int_0^tc(u)p(t-u)\,du$ (with $c=1-g$ on $[0,\frac12]$, $c=1$ after) gives $F=0.68620112$ for this profile. The same solver reproduces Harcos's $0.693676$ for a constant phase.
-- **The route of Section 4** in floating point gives $F=0.68620113$.
-- **Finite $n$.** The exact construction of Section 3 (with $K=\lfloor n/2\rfloor$) gives $F_n=0.6862575$, $0.6862194$, $0.6862070$ for $n=2.5\cdot10^5$, $10^6$, $4\cdot10^6$. These values approach the same limit.
-- **The checker's error bound.** Inside the sampled cells, the true residual $|R/t|$ computed by adaptive quadrature never exceeds the checker's cell bound. At the worst cell (just after the first knot) the two are $4.18\cdot10^{-4}$ and $4.24\cdot10^{-4}$ (for $M=40$).
-- **The best value of this family.** Optimizing the profile directly in the limit gives about $0.686361$ for the best constant of this family. This is not claimed. The claim $0.6865$ leaves a safety margin of $3\cdot10^{-4}$ for the certified computation.
+- **Direct solver.** A solver for the equation $tp(t)=\int_0^tc(u)p(t-u)\,du$ (with $c=1-g$ on $[0,\frac12]$, $c=1$ after) gives $F=0.68636008$ for the profile with $T=0.68637$, and $F=0.68620112$ for the version-1.0.0 profile. The same solver reproduces Harcos's $0.693676$ for a constant phase.
+- **Finite $n$.** The exact construction of Section 3 (with $K=\lfloor n/2\rfloor$) gives $F_n=0.6864165$, $0.6863783$, $0.6863660$ for $n=2.5\cdot10^5$, $10^6$, $4\cdot10^6$, for the profile with $T=0.68637$. These values approach the same limit $0.68636$ from above.
+- **The checker's error bound.** Inside the sampled cells, the true residual $|R/t|$ computed by adaptive quadrature never exceeds the checker's cell bound. At the worst cell (just after the first knot) the two are $4.17\cdot10^{-4}$ and $4.22\cdot10^{-4}$ (profile $T=0.68637$, $M=40$).
+- **The best value of this family.** Minimizing $\max(T,F)$ over profiles, in floating point and directly in the limit, gives about $0.6863655$ with the 24 equal pieces used here, and about $0.686361$ with knots that are finer near $0$. (The profile of this repository has $F\approx0.6863601<T$. Lowering $T$ to the optimum would leave no room for the certified error bound.) These optimal values are not claimed. The claim $0.68637$ is within $10^{-5}$ of the first one.
 
 ## 6. Relation to earlier work
 
@@ -284,6 +303,10 @@ Hence $F<0.6865=T$, and by Theorem A, $\limsup_n R_n\le0.6865$. $\blacksquare$
 - The 2026 certificates in the Optimization Constants repository (Griego, Röhrig, Plata, Pinho, Koshta) refine a block construction whose first block has a constant phase.
 - The present construction lets the phase vary from the start: "first-block cut-off $\tau=0$". The limit is described by the integral equation (2) instead of correction terms.
 - Theorem A is self-contained and does not use those works.
+
+## Acknowledgement
+
+We thank Ricardo Pinho for reading the code carefully and for reporting the missing check of the denominator (see Versions).
 
 ## AI use
 

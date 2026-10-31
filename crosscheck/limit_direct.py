@@ -2,10 +2,10 @@
 limit_direct.py  --  floating-point cross-check (NOT part of the proof).
 Solves  t p(t) = int_0^t c(u) p(t-u) du  (c = 1 - g on [0,1/2], c = 1 after) directly by product integration,
 with p = t^(-gamma) q(t), and prints F = |p(1)| / int_0^(1/2) |p| dt/(1-t).
-Test 1: constant phase (Harcos), known value 0.693676.   Test 2: the profile of c42_profile_0.6865.json.
-Run:  python crosscheck/limit_direct.py      (seconds; needs numpy)
+Test 1: constant phase (Harcos), known value 0.693676.   Test 2: a profile (default c42_profile_0.68637.json, or the file given as argument).
+Run:  python crosscheck/limit_direct.py [profile.json]      (seconds; needs numpy)
 """
-import json, os, numpy as np
+import json, os, sys, numpy as np
 
 def solve(gfun, N):
     h = 1.0 / N; gam = gfun(0.0)
@@ -30,8 +30,8 @@ def solve(gfun, N):
 if __name__ == "__main__":
     w = -0.43246 - 0.54237j
     print("Harcos (constant phase), F =", "%.8f" % solve(lambda x: -w + 0 * np.asarray(x), 4000), " (expected 0.693676)")
-    prof = json.load(open(os.path.join(os.path.dirname(__file__), "..", "c42_profile_0.6865.json")))
+    prof = json.load(open(sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..", "c42_profile_0.68637.json")))
     T = float(prof["T"]); ph = np.array([float(x) for x in prof["phases"]]); kn = np.arange(25) / 48
     g = lambda x: T * np.exp(1j * np.interp(x, kn, ph))
     for N in (4000, 8000, 16000):
-        print(f"profile 0.6865, N = {N:>5}: F = {solve(g, N):.10f}")
+        print(f"profile T = {T}, N = {N:>5}: F = {solve(g, N):.10f}")
